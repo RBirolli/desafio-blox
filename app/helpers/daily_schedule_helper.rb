@@ -1,0 +1,2 @@
+module DailyScheduleHelper
+end
