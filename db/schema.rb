@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 2021_03_01_185151) do
     t.bigint "meeting_rooms_id"
     t.integer "user_id", null: false
     t.string "subject", null: false
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.datetime "start_date", null: false
+    t.datetime "end_date", null: false
     t.integer "status", default: 1, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
