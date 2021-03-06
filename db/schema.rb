@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_185151) do
   enable_extension "plpgsql"
 
   create_table "daily_schedules", force: :cascade do |t|
-    t.bigint "meeting_rooms_id"
+    t.bigint "meeting_room_id"
     t.integer "user_id", null: false
     t.string "subject", null: false
     t.datetime "start_date", null: false
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_185151) do
     t.integer "status", default: 1, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["meeting_rooms_id"], name: "index_daily_schedules_on_meeting_rooms_id"
+    t.index ["meeting_room_id"], name: "index_daily_schedules_on_meeting_room_id"
   end
 
   create_table "meeting_rooms", force: :cascade do |t|

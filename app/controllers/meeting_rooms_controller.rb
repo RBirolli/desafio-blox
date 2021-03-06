@@ -4,10 +4,14 @@ class MeetingRoomsController < ApplicationController
 	before_action :validate_user, only: [:new]
 
 	def new
-		###  Criar uma nova sala de reunião
-		###  Parametros: user_id, name, local
-		message = {origin: "", message: "Nova sala cadastrada com sucesso", status: 201}
-		@current_user.meeting_rooms.create!(@params) rescue (message = {origin: "validate_user", message: "Erro na inclusão de nova sala", status: 401})
+		begin
+			###  Criar uma nova sala de reunião
+			message = {origin: "", message: "Nova sala cadastrada com sucesso", status: 201}
+			@current_user.meeting_rooms.create!(@params)
+		rescue => error
+ 			message = {origin: "validate_user", message: (error.message[19, 30] == 'Name has already been taken' ? "Nome da sala já cadastrado" : "Erro na inclusão de nova sala"), status: 401}
+		end
+
 		return_json(message)
 	end
 
@@ -42,7 +46,7 @@ class MeetingRoomsController < ApplicationController
 		message = {origin: "", message: "Sala excluida com sucesso", status: 200}
 		room = MeetingRoom.where(id: params['room'].to_i)
 		room[0].nil? ? (message = {origin: "validate_user", message: "Sala não localizada", status: 401}) : (room.delete(params['room']) )
-		
+
 		return_json(message)
 	end
 
@@ -56,13 +60,5 @@ class MeetingRoomsController < ApplicationController
 	def validate_new_params
 		@params = params.permit(:name, :local, :user_id)
 	end
-
-	def return_json(resource, status = nil)
-		if resource.class != Hash
-			render json: resource, status: status
-		else
-	        Rails.logger.info("\n\n*****  MeetingRoomsController/#{origem} - #{message}\n") if resource[:origem] == ""
-			render :json => resource[:message] , status: resource[:status]
-		end
-	end
 end
+	

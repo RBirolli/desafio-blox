@@ -7,4 +7,7 @@ Rails.application.routes.draw do
 	get 'meeting_rooms/list_all', to: 'meeting_rooms#list_all'
 	delete 'meeting_room', to: 'meeting_rooms#delete'
 
+	post '/daily_schedules/new', to: 'daily_schedule#new'
+	get '/daily_schedules/list_schedule', to: 'daily_schedule#list_schedule'
+	delete '/daily_schedules', to: 'daily_schedule#cancel_schedule'
 end
