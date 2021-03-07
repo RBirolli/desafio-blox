@@ -62,17 +62,35 @@ class DailyScheduleController < ApplicationController
 
 	def cancel_schedule
 		###  Libera a reserva de uma sala / período
-		DailySchedule.find(params['id']).destroy rescue (return_json({origin: "cancel_schedule", message: 
-					"Erro no cancelamento de agenda", status: 403}))
+		daily_sch = DailySchedule.find(params['id'])
 
-		return_json({origin: "", message: "Cancelamento efetuado com sucesso", status: 200})
+		if daily_sch['user_id'] != params['user_id'].to_i
+			###  Usuário não autorizado
+			response = {origin: "", message: "Usuário não autorizado a cancelar o agendamento" , status: 400}
+		else
+			response = {origin: "", message: "Cancelamento efetuado com sucesso", status: 200}
+			DailySchedule.find(params['id']).destroy rescue (response = {origin: "cancel_schedule", message: 
+					"Erro no cancelamento de agenda", status: 403})
+		end
+
+		return_json(response)
 	end
 
 	def list_schedule
 		###  Lista as reservas por um ou mais dias úteis.
-#		response = DailySchedule.where("start_date::date BETWEEN #{@params[:start_date]} AND #{@params[:end_date]}").order(start_date)
-#		response = DailySchedule.where(meeting_room_id: params['room']).where("start_date BETWEEN #{@params[:start_date]} AND #{@params[:end_date]}").order(start_date)
-		response = DailySchedule.where(meeting_room_id: params['room']).order(:start_date)
+		if params['room'].nil?
+			###  Lista todas as salas
+			response = DailySchedule.joins("join users on users.id = daily_schedules.user_id").where("start_date::DATE BETWEEN '#{params['start_date']}' AND '#{params['end_date']}'").select(
+				"daily_schedules.id, daily_schedules.meeting_room_id, daily_schedules.subject, daily_schedules.start_date,
+				daily_schedules.end_date, users.name").order(:start_date)
+		else
+			###  Lista somente a sala solicitada
+			response = DailySchedule.joins("join users on users.id = daily_schedules.user_id").where(meeting_room_id: params['room']).where("
+				start_date::DATE BETWEEN '#{params['start_date']}' AND '#{params['end_date']}'").select(
+				"daily_schedules.id, daily_schedules.meeting_room_id, daily_schedules.subject, daily_schedules.start_date,
+				daily_schedules.end_date, users.name").order(:start_date)
+		end
+
 		return_json(response, 200)
 	end
 
