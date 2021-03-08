@@ -9,7 +9,7 @@ class MeetingRoomsController < ApplicationController
 			message = {origin: "", message: "Nova sala cadastrada com sucesso", status: 201}
 			@current_user.meeting_rooms.create!(@params)
 		rescue => error
- 			message = {origin: "validate_user", message: (error.message[19, 30] == 'Name has already been taken' ? "Nome da sala já cadastrado" : "Erro na inclusão de nova sala"), status: 401}
+ 			message = {origin: "validate_user", message: (error.message[19, 30] == 'Name has already been taken' ? "Nome da sala já cadastrado" : "Erro na inclusão de nova sala"), status: 404}
 		end
 
 		return_json(message)
@@ -18,7 +18,7 @@ class MeetingRoomsController < ApplicationController
 	def show
 		###  Exibir os dados de uma determinada sala de reunião
 		response = MeetingRoom.where(id: params['room'].to_i).select(
-				:id, :name, :local) rescue (response = {origin: "show", message: "Sala não localizada", status: 403})
+				:id, :name, :local) rescue (response = {origin: "show", message: "Sala não localizada", status: 404})
 		(response = {origin: "show", message: "Sala não localizada", status: 404}) if response[0].nil?
 
 		return_json(response, 200)
@@ -27,8 +27,8 @@ class MeetingRoomsController < ApplicationController
 	def search_by_name
 		###  Procurar uma sala pelo nome
 		response = MeetingRoom.where("name ilike '%#{params[:by_name]}%'").select(
-				:id, :name, :local) rescue (response = {origin: "show", message: "Sala não localizada", status: 403})
-		(response = {origin: "show", message: "Sala não localizada", status: 403}) if response[0].nil?
+				:id, :name, :local) rescue (response = {origin: "show", message: "Sala não localizada", status: 404})
+		(response = {origin: "show", message: "Sala não localizada", status: 404}) if response[0].nil?
 
 		return_json(response, 200)
 	end
@@ -36,7 +36,7 @@ class MeetingRoomsController < ApplicationController
 	def list_all
 		###  Exibir a lista de todas as salas
 		response = MeetingRoom.all.select(:id, :name, :local) rescue (response = {origin: "show", message: "Não tem Sala Cadastrada", status: 404})
-		(response = {origin: "show", message: "Não tem Sala Cadastrada", status: 403}) if response[0].nil?
+		(response = {origin: "show", message: "Não tem Sala Cadastrada", status: 404}) if response[0].nil?
 
 		return_json(response, 200)
 	end
@@ -45,7 +45,7 @@ class MeetingRoomsController < ApplicationController
 		###  Excluir uma sala
 		message = {origin: "", message: "Sala excluida com sucesso", status: 200}
 		room = MeetingRoom.where(id: params['room'].to_i)
-		room[0].nil? ? (message = {origin: "validate_user", message: "Sala não localizada", status: 401}) : (room.delete(params['room']) )
+		room[0].nil? ? (message = {origin: "validate_user", message: "Sala não localizada", status: 404}) : (room.delete(params['room']) )
 
 		return_json(message)
 	end

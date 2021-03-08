@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe MeetingRoom, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
 
   subject {
-    described_class.new(name: "Anything", user_id: 1, local: "Anywhere", status: 1, created_at: Time.now, updated_at: Time.now)
+    user = User.create!(name: "User 123")
+    described_class.new(name: "Anything", user_id: user.id, local: "Anywhere", status: 1, created_at: Time.now, updated_at: Time.now)
   }
 
   it "is valid with valid attributes" do
